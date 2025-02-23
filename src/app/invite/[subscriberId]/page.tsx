@@ -1,15 +1,44 @@
 import Image from 'next/image';
 
-import logo from '../../assets/logo.svg';
+import logo from '../../../assets/logo.svg';
 
-import Ranking from './ranking';
-import Stats from './stats';
+import {Ranking} from './ranking';
 import InviteLinkInput from './invite-link-input';
+import { Stats } from './stats';
 
 
-export default function InvitePage(){
+interface InvitepageProps {
+    // para acessar id do usuario na rota
+    // colcamos tudo dentro de uma pasta
+    // com nome [subscriberId]
+    params: Promise <{
+        subscriberId: string
+    }>
+}
 
-    const inviteLink = 'http://localhost:3000/invite/827349150138';
+// forma mais simples de fazer 
+
+// fetch('http://localhost:3333/subscriptions', {
+//     method: 'POST',
+//     body: JSON.stringify({
+//       name: 'Diego',
+//       email: ''
+//     })
+// })
+
+// quando ta bem documentado da pra fazer o front
+// saber todas as rotas do back com o orval
+
+// usando o orval, ele cria um arquivo typescript
+// com todas as rotas e paramentros, e etc da
+// aplicação e tambem gera todas as funções
+// pra fetch e as coisas necess. pra comun c backend
+
+
+export default async function InvitePage(props: InvitepageProps){
+    const {subscriberId} = await props.params;
+
+    const inviteLink = `http://localhost:3333/invites/${subscriberId}`;
 
 
     return (
@@ -41,7 +70,7 @@ export default function InvitePage(){
 
                     <InviteLinkInput inviteLink={inviteLink}/>
 
-                    <Stats/>
+                    <Stats subscriberId={subscriberId}/>
                 </div>
             </div>
 

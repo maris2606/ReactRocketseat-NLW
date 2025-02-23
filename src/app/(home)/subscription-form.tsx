@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 // integração com a biblio de validação
 import { zodResolver } from '@hookform/resolvers/zod';
+import { subscribeToEvent } from '@/http/api';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // coloca como eu espero que o data esteja
 const subscriptionSchema = z.object({
@@ -20,22 +22,37 @@ const subscriptionSchema = z.object({
 type subscriptionSchema = z.infer<typeof subscriptionSchema>
 
 export default function SubscriptionForm() {
+  
+  // pra mudar de pagina
+  const router = useRouter();
+  const searchParams = useSearchParams()
+
 
   // Biblioteca pra lidar com form
   // formstate pra capturar erro
   // coloca < { name: string email:string} > 
   // pra poder identificar auto os campos no errors
-  const { register, handleSubmit , formState:{ errors }} = useForm 
+  const { register, handleSubmit , formState:{ errors }} 
+  = useForm <subscriptionSchema>
     // <{ name: string,
     // email:string }>
     // passa só o tipo inferido acima
-    <subscriptionSchema> 
   ({
-    resolver: zodResolver(subscriptionSchema)
-  });
+    resolver: zodResolver(subscriptionSchema),
+  })
 
-  function onSubscribe (data : subscriptionSchema){ // API de form 
-    console.log(data); 
+  async function onSubscribe ({name, email} : subscriptionSchema){ // API de form 
+    const referrer = searchParams.get('referrer')
+
+    // isso daqui esta def no arquivo gerado pelo orval
+    const { subscriberId } = await subscribeToEvent({ 
+      /* já avisa oq precisa mandar */
+      name,
+      email,
+      referrer
+    })
+
+    router.push(`/invite/${subscriberId}`)
   }
 
 
